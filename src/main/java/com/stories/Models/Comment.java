@@ -12,25 +12,30 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 @Data
 @Entity
+@NoArgsConstructor
 public class Comment {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id ;
-	
-	
+
 	public String content;
 		
 	public Timestamp timeComment;
 	
 	
+	  public Comment(String content, Post post ,Author author) {
+	      	this.content = content ;
+	      	this.CPost = post ;
+	      	this.CBlogger = author ;
+	        this.timeComment = new Timestamp(System.currentTimeMillis());
+	    }
 	
-	public void setTimePostedNow() {
-        this.timeComment = new Timestamp(System.currentTimeMillis());
-    }
-	
+
+	 @JsonIgnore
 	 @ManyToOne
 	 @JoinColumn(name="idPost")
      private Post CPost;

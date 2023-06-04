@@ -3,7 +3,7 @@ package com.stories.Models;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.stories.Repository.AuthorRepository;
@@ -17,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -40,6 +41,9 @@ public class Post{
 	
 	public int nbrseeing ;
 	
+	public void updateNumberSee() {
+		this.nbrseeing ++ ;
+	}
 	
 	  public Post(String title, String content, String img ,Author author) {
 	        this.title = title;
@@ -62,5 +66,14 @@ public class Post{
 	 
 	 @OneToMany(mappedBy="post" , cascade = CascadeType.PERSIST)
 	 private List<TagPost> ListPost = new ArrayList<TagPost>();
-		
+	
+	  @Transient
+	  private List<String> tagNames;
+
+	    public List<String> getTagNames() {
+	        if (tagNames == null) {
+	            tagNames = ListPost.stream().map(tagPost -> tagPost.getTag().getName()).collect(Collectors.toList());
+	        }
+	        return tagNames;
+	    }
 }

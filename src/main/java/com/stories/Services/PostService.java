@@ -16,6 +16,7 @@ import com.stories.Repository.PostRepository;
 import com.stories.Repository.TagPostRepository;
 import com.stories.Repository.TagRepository;
 import com.stories.Requests.PostRequest;
+import com.stories.Requests.postResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +41,27 @@ public class PostService {
 		return postrepo.findAll() ;
 	}
 	
-	public Optional <Post> getPostById(int id) {
-        return postrepo.findById(id);
+	public Optional <Post> UpdatePostById(int id){
+		Optional<Post> optionalPost = postrepo.findById(id);
+		  Post post = optionalPost.get();
+		  post.updateNumberSee();
+		  postrepo.save(post);	
+		  return Optional.of(post);
+	}
+	
+	public Optional <postResponse> getPostById(int id) {
+		Optional<Post> optionalPost = postrepo.findById(id);
+	    Post post = optionalPost.get();
+        List<String> tagNames = post.getTagNames();
+        postResponse pResponse = new postResponse(post.getId(), post.getTitle(), post.getContent(), post.getPostimageurl(), post.getTimePosted(), post.getNbrseeing(), post.getBlogger(), tagNames,post.getListC());
+
+        return Optional.of(pResponse);
 
     }
 	
-	
+	public List<Post> getPostsByAuthorId(int authorId) {
+	    return postrepo.findByBloggerId(authorId);
+	}
 	
 
 	
@@ -89,6 +105,12 @@ public class PostService {
 	}
 
 
+	public ResponseEntity<?> delete(int id) {  
+		Post existingPost = postrepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
+		postrepo.deleteById(id);
+		return ResponseEntity.ok("Post deleted");
+	}
+	
 	
 	public ResponseEntity<?> add(PostRequest P) {
 		autherrepo.findById(P.getAuthorId())
